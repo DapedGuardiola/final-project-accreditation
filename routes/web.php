@@ -27,10 +27,10 @@ use App\Http\Controllers\ValidasiController;
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthController::class, 'login'])->name('login');
     Route::post('postlogin', [AuthController::class, 'postlogin'])->name('postlogin');
-    Route::get('lupaPassword',[AuthController::class,'lupaPassword'])->name('lupaPassword');
-    Route::POST('verifyDataGuest',[AuthController::class,'verifyDataGuest'])->name('verifyDataGuest');
-    Route::GET('/{id}/newPassword',[AuthController::class,'newPassword'])->name('newPassword');
-    Route::put('/{id}/updatePassword',[AuthController::class,'updatePassword'])->name('updatePassword');
+    Route::get('lupaPassword', [AuthController::class, 'lupaPassword'])->name('lupaPassword');
+    Route::POST('verifyDataGuest', [AuthController::class, 'verifyDataGuest'])->name('verifyDataGuest');
+    Route::GET('/{id}/newPassword', [AuthController::class, 'newPassword'])->name('newPassword');
+    Route::put('/{id}/updatePassword', [AuthController::class, 'updatePassword'])->name('updatePassword');
 });
 
 Route::middleware('auth')->group(function () {
@@ -75,10 +75,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/import_ajax', [UserController::class, 'import_ajax'])->name('import_ajax');
         Route::get('/export_excel', [UserController::class, 'export_excel'])->name('export_excel');
         Route::get('/export_pdf', [UserController::class, 'export_pdf'])->name('export_pdf');
+
+        Route::get('/pageProfile', [UserController::class, 'pageProfile'])->name('pageProfile');
+        Route::get('/{id}/editProfile_ajax', [UserController::class, 'editProfile_ajax'])->name('editProfile_ajax');
+        Route::PUT('/{id}/updateProfile_ajax', [UserController::class, 'updateProfile_ajax'])->name('updateProfile_ajax');
+        Route::get('/editPhoto_ajax', [UserController::class, 'editPhoto_ajax'])->name('editPhoto_ajax');
+        Route::post('/storePhoto',[UserController::class,'storePhoto'])->name('storePhoto');
         
-        Route::get('/pageProfile',[UserController::class,'pageProfile'])->name('pageProfile');
-        Route::get('/{id}/editProfile_ajax', [UserController::class,'editProfile_ajax'])->name('editProfile_ajax');
-        Route::PUT('/{id}/updateProfile_ajax', [UserController::class,'updateProfile_ajax'])->name('updateProfile_ajax');
     });
 
     Route::prefix('p_sertifikasi')->name('p_sertifikasi.')->middleware('authorize:DOS,ANG,ADM')->group(function () {
@@ -106,7 +109,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('validasi')->name('validasi.')->middleware('authorize:ADM,VAL')->group(function () {
         Route::GET('/', [ValidasiController::class, 'index'])->name('index');
         Route::POST('/showFile', [ValidasiController::class, 'showFile'])->name('showFile');
-        Route::PUT('/valid', [ValidasiController::class,'valid'])->name('valid');
+        Route::PUT('/valid', [ValidasiController::class, 'valid'])->name('valid');
         Route::PUT('/store', [ValidasiController::class, 'store'])->name('store');
     });
 
@@ -151,6 +154,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/import_ajax', [PPrestasiController::class, 'import_ajax'])->name('import_ajax');
         Route::get('/export_excel', [PPrestasiController::class, 'export_excel'])->name('export_excel');
         Route::get('/export_pdf', [PPrestasiController::class, 'export_pdf'])->name('export_pdf');
+
+        Route::get('/chart1', [PPrestasiController::class, 'chart1'])->name('chart1');
+        Route::get('/chart2', [PPrestasiController::class, 'chart2'])->name('chart2');
     });
 
     Route::prefix('p_organisasi')->name('p_organisasi.')->middleware('authorize:DOS,ANG,ADM')->group(function () {
@@ -172,5 +178,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/import_ajax', [POrganisasiController::class, 'import_ajax'])->name('import_ajax');
         Route::get('/export_excel', [POrganisasiController::class, 'export_excel'])->name('export_excel');
         Route::get('/export_pdf', [POrganisasiController::class, 'export_pdf'])->name('export_pdf');
+        Route::get('/chart1', [POrganisasiController::class, 'chart1'])->name('chart1');
+        Route::get('/chart2', [POrganisasiController::class, 'chart2'])->name('chart2');
     });
 });

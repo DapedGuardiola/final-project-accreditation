@@ -26,12 +26,12 @@
                         <a id="exportPdfBtn" class="btn btn-custom-blue me-2" href="{{ route('p_kegiatan.export_pdf') }}">
                             <i class="fa-solid fa-file-pdf me-2"></i> Export PDF
                         </a>
-                        <a id="exportExcelBtn" class="btn btn-custom-blue me-2" href="{{ route('p_kegiatan.export_excel') }}">
+                        <a id="exportExcelBtn" class="btn btn-custom-blue me-2"
+                            href="{{ route('p_kegiatan.export_excel') }}">
                             <i class="fas fa-file-excel me-2"></i> Export Excel
                         </a>
                         @if ($isAdm || $isDos)
-                            <button class="btn btn-custom-blue me-2"
-                                onclick="modalAction('{{ route('p_kegiatan.import') }}')">
+                            <button class="btn btn-custom-blue me-2" onclick="modalAction('{{ route('p_kegiatan.import') }}')">
                                 <i class="fa-solid fa-file-arrow-up me-2"></i> Import Data
                             </button>
                             <button onclick="modalAction('{{ route('p_kegiatan.create_ajax') }}')"
@@ -66,10 +66,18 @@
 
                 <div class="table-responsive">
                     {{ $dataTable->table([
-                        'id' => 'p_kegiatan-table',
-                        'class' => 'table table-hover table-bordered table-striped',
-                        'style' => 'width:100%',
-                    ]) }}
+        'id' => 'p_kegiatan-table',
+        'class' => 'table table-hover table-bordered table-striped',
+        'style' => 'width:100%',
+    ]) }}
+                </div>
+            </div>
+
+        </div>
+        <div class="card shadow-sm">
+            <div class="col-md-3">
+                <div>
+                    <canvas id="chart1"></canvas>
                 </div>
             </div>
         </div>
@@ -91,13 +99,13 @@
     <script>
         function modalAction(url) {
             $.get(url)
-                .done(function(response) {
+                .done(function (response) {
                     $('#myModal .modal-content').html(response);
                     $('#myModal').modal('show');
 
                     $(document).off('submit', '#formCreateKegiatan, #formEditKegiatan');
 
-                    $(document).on('submit', '#formCreateKegiatan, #formEditKegiatan', function(e) {
+                    $(document).on('submit', '#formCreateKegiatan, #formEditKegiatan', function (e) {
                         e.preventDefault();
                         var form = $(this);
                         var formData = new FormData(form[0]);
@@ -115,7 +123,7 @@
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
-                            success: function(res) {
+                            success: function (res) {
                                 $('#myModal').modal('hide');
                                 window.LaravelDataTables["p_kegiatan-table"].ajax.reload();
                                 if (res.alert && res.message) {
@@ -128,11 +136,11 @@
                                     });
                                 }
                             },
-                            error: function(xhr) {
+                            error: function (xhr) {
                                 if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON
                                     .msgField) {
                                     var errors = xhr.responseJSON.msgField;
-                                    $.each(errors, function(field, messages) {
+                                    $.each(errors, function (field, messages) {
                                         var input = form.find('[name="' + field + '"]');
                                         input.addClass('is-invalid');
                                         input.next('.invalid-feedback').text(messages[0]);
@@ -160,7 +168,7 @@
 
                     $(document).off('submit', '#form-import');
 
-                    $(document).on('submit', '#form-import', function(e) {
+                    $(document).on('submit', '#form-import', function (e) {
                         e.preventDefault();
                         var form = $(this);
                         var formData = new FormData(form[0]);
@@ -175,7 +183,7 @@
                             data: formData,
                             processData: false,
                             contentType: false,
-                            success: function(response) {
+                            success: function (response) {
                                 $('#myModal').modal('hide');
                                 if (response.alert && response.message) {
                                     Swal.fire({
@@ -191,7 +199,7 @@
                                     });
                                 }
                             },
-                            error: function(xhr) {
+                            error: function (xhr) {
                                 $('#myModal').modal('hide');
                                 if (xhr.responseJSON && xhr.responseJSON.alert && xhr.responseJSON
                                     .message) {
@@ -210,26 +218,26 @@
                                     });
                                 }
                             },
-                            complete: function() {
+                            complete: function () {
                                 submitBtn.prop('disabled', false).html(
                                     '<i class="fas fa-upload me-2"></i> Upload');
                             }
                         });
                     });
                 })
-                .fail(function(xhr) {
+                .fail(function (xhr) {
                     Swal.fire('Error!', 'Gagal memuat form: ' + xhr.statusText, 'error');
                 });
         }
 
-        $(document).on('submit', '#formDeleteKegiatan', function(e) {
+        $(document).on('submit', '#formDeleteKegiatan', function (e) {
             e.preventDefault();
             var form = $(this);
             $.ajax({
                 url: form.attr('action'),
                 method: 'POST',
                 data: form.serialize(),
-                success: function(response) {
+                success: function (response) {
                     $('#myModal').modal('hide');
                     window.LaravelDataTables["p_kegiatan-table"].ajax.reload();
                     Swal.fire({
@@ -240,7 +248,7 @@
                         showConfirmButton: false
                     });
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Gagal',
@@ -250,13 +258,13 @@
             });
         });
 
-        $(document).ready(function() {
-            $('#filterStatus, #filterSumberData').change(function() {
+        $(document).ready(function () {
+            $('#filterStatus, #filterSumberData').change(function () {
                 window.LaravelDataTables["p_kegiatan-table"].draw();
             });
         });
 
-        $('#p_kegiatan-table').on('preXhr.dt', function(e, settings, data) {
+        $('#p_kegiatan-table').on('preXhr.dt', function (e, settings, data) {
             data.filter_status = $('#filterStatus').val();
             data.filter_sumber = $('#filterSumberData').val();
         });
@@ -287,13 +295,15 @@
             $('#exportExcelBtn').attr('href', url.toString());
         }
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             updateExportPdfLink();
             updateExportExcelLink();
-            $('#filterStatus, #filterSumberData').change(function() {
+            $('#filterStatus, #filterSumberData').change(function () {
                 updateExportPdfLink();
                 updateExportExcelLink();
             });
         });
+
+
     </script>
 @endpush

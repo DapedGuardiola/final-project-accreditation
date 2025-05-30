@@ -23,6 +23,9 @@
     <!-- Bootstrap 5 -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     @stack('css')
+    <!-- ChartJS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         .card-header {
             border-bottom: none;

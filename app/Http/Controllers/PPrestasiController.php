@@ -657,4 +657,36 @@ class PPrestasiController extends Controller
             'message' => 'Status berhasil diperbarui',
         ]);
     }
+    public function chart1(){
+        $data = PPrestasiModel::select(DB::raw('COUNT(id_user) as jumlah, tingkat'))
+            ->groupBy('tingkat')
+            ->get();if(!$data) {
+            return response()->json([
+                'message' => 'Data tidak ditemukan',
+                'status' => false
+            ], 404);
+        }
+
+        return response()->json([
+            'data' => $data,
+            'status' => true,
+            'message' => 'Data berhasil diambil'
+        ]);
+    }
+    public function chart2(){
+        $data = PPrestasiModel::select(DB::raw('COUNT(id_user) as jumlah, status'))
+            ->groupBy('status')
+            ->get();if(!$data) {
+            return response()->json([
+                'message' => 'Data tidak ditemukan',
+                'status' => false
+            ], 404);
+        }
+
+        return response()->json([
+            'data' => $data,
+            'status' => true,
+            'message' => 'Data berhasil diambil'
+        ]);
+    }
 }

@@ -633,4 +633,5 @@ class PKegiatanController extends Controller
 
         return $pdf->stream('Data Kegiatan ' . date('d-m-Y H:i:s') . '.pdf');
     }
+    
 }

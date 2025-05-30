@@ -15,6 +15,9 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File; 
 
 class UserController extends Controller
 {
@@ -508,5 +511,37 @@ class UserController extends Controller
 
         // Jika bukan AJAX, redirect ke homepage
         return redirect('/');
+    }
+    public function editPhoto_ajax()
+    {
+        return view('user.editPhoto_ajax');
+    }
+    public function storePhoto(Request $request)
+    {
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048',
+        ]);
+
+        $user = Auth::user();
+
+        // Hapus avatar lama kalau ada
+        $path = public_path('img/userAvatars/' . $user->id_user.'.png');
+
+    // Hapus file lama jika ada
+    if (File::exists($path)) {
+        File::delete($path);
+    }
+        // Simpan avatar baru
+        $filename = $user->id_user . '.png' ;
+        // $request->avatar->storeAs('public/image/avatars/'. $filename);
+        $request->file('avatar')->move(public_path('img/userAvatars'), $filename);
+        // Update di database
+        // $user->avatar = $filename;
+        $user->save();
+        return response()->json([
+            'status' => true,
+            'message' => 'Data berhasil diimport'
+        ]);
+
     }
 }
