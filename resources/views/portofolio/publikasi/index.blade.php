@@ -20,7 +20,8 @@
         <!-- Publikasi -->
         <div class="callout callout-primary shadow-sm">
             <h5>Publikasi</h5>
-            <p>Hasil publikasi artikel ilmiah, karya ilmiah, atau karya seni yang dipublikasikan dosen tetap sesuai bidang keilmuan dalam tiga tahun
+            <p>Hasil publikasi artikel ilmiah, karya ilmiah, atau karya seni yang dipublikasikan dosen tetap sesuai bidang
+                keilmuan dalam tiga tahun
                 terakhir.</p>
         </div>
 
@@ -91,43 +92,55 @@
                 </div>
             </div>
         </div>
-    @if($isAdm || $isAng)
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">Jumlah Partisipasi Berdasarkan skala</h3>
-
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart">
-                            <canvas id="chartPublikasi1"
-                                style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                        </div>
-                    </div>
-                </div>
+        @if ($isAdm || $isAng)
+            <!-- Chart -->
+            <div class="callout callout-primary shadow-sm">
+                <h5>Chart</h5>
+                <p>Chart berikut menampilkan distribusi jenis publikasi dan tren publikasi per tahun.</p>
             </div>
-            <div class="col-md-6">
-                <div class="card card-danger">
-                    <div class="card-header">
-                        <h3 class="card-title">Status Validasi</h3>
 
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                            </button>
+            <div class="container-fluid mt-3">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary border-bottom">
+                                <h5 class="card-title mb-0 text-white">Distribusi Jenis Publikasi</h5>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body collapse">
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <canvas id="pieChartJenisPublikasi"
+                                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <canvas id="chartPublikasi2"
-                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary border-bottom">
+                                <h5 class="card-title mb-0 text-white">Tren Publikasi Per Tahun</h5>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body collapse">
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <canvas id="barChartTahunPublikasi"
+                                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <!-- /.card-body -->
                 </div>
             </div>
         @endif
@@ -136,6 +149,8 @@
 
 @push('scripts')
     {!! $dataTable->scripts() !!}
+
+    {{-- Modal Action --}}
     <script>
         function modalAction(url) {
             $.get(url)
@@ -329,45 +344,82 @@
             updateExportLinks();
             $('#filterStatus, #filterSumberData').change(updateExportLinks);
         });
+    </script>
 
-        $(document).ready(function () {
-            $.ajax({
-                url: "{{ route('portofolio.publikasi.chart1') }}",
-                method: 'GET',
-                success: function (response) {
-                    const tingkat = [];
-                    const jumlah = [];
-                    console.log(response.data);
-                    response.data.forEach(item => {
-                        tingkat.push(item.tingkat);
-                        jumlah.push(item.jumlah);
-                    });
+    {{-- Chart.js --}}
+    <script>
+        // Prepare chart data from PHP variables
+        const tahunPublikasiLabels = @json($tahunPublikasiLabels);
+        const tahunPublikasiData = @json($tahunPublikasiData);
+        const jenisPublikasiLabels = @json($jenisPublikasiLabels);
+        const jenisPublikasiData = @json($jenisPublikasiData);
 
-                    const ctx = document.getElementById('chartPublikasi1').getContext('2d');
+        // Colors for charts
+        const chartColors = [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+            '#FF9F40', '#E7E9ED', '#76A346', '#D9534F', '#5BC0DE'
+        ];
 
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: tingkat,
-                            datasets: [{
-                                label: tingkat,
-                                data: jumlah,
-                                backgroundColor: ['bronze', 'silver'],
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                y: {
-                                    beginAtZero: true
-                                }
-                            }
+        // Bar Chart - Distribusi Tahun Publikasi
+        const ctxBar = document.getElementById('barChartTahunPublikasi').getContext('2d');
+        const barChartTahunPublikasi = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: tahunPublikasiLabels,
+                datasets: [{
+                    label: 'Jumlah',
+                    data: tahunPublikasiData,
+                    backgroundColor: chartColors,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 45,
+                            minRotation: 45,
                         }
-                    });
+                    },
+                    y: {
+                        beginAtZero: true,
+                        precision: 0,
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    title: {
+                        display: false,
+                    }
                 }
-            });
+            }
+        });
+
+        // Pie Chart - Distribusi Jenis Publikasi
+        const ctxPie = document.getElementById('pieChartJenisPublikasi').getContext('2d');
+        const pieChartJenisPublikasi = new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: jenisPublikasiLabels,
+                datasets: [{
+                    data: jenisPublikasiData,
+                    backgroundColor: chartColors,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    title: {
+                        display: false,
+                    }
+                }
+            }
         });
     </script>
 @endpush

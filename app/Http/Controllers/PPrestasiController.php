@@ -27,7 +27,30 @@ class PPrestasiController extends Controller
         $isDos = $user->hasRole('DOS');
         $isAng = $user->hasRole('ANG');
 
-        return $dataTable->render('portofolio.prestasi.index', compact('isAdm', 'isAng', 'isDos'));
+        // Distribution of tingkat (level)
+        $tingkatDistribution = PPrestasiModel::select('tingkat', DB::raw('count(*) as total'))
+            ->groupBy('tingkat')
+            ->orderBy('total', 'desc')
+            ->get();
+
+        // Trend of prestasi per year (extract year from waktu_pencapaian)
+        $prestasiTrend = PPrestasiModel::select(DB::raw('YEAR(waktu_pencapaian) as year'), DB::raw('count(*) as total'))
+            ->groupBy('year')
+            ->orderBy('year', 'asc')
+            ->get();
+
+        // Prepare data arrays for charts
+        $tingkatLabels = $tingkatDistribution->pluck('tingkat');
+        $tingkatData = $tingkatDistribution->pluck('total');
+
+        $prestasiTrendLabels = $prestasiTrend->pluck('year');
+        $prestasiTrendData = $prestasiTrend->pluck('total');
+
+        return $dataTable->render('portofolio.prestasi.index', compact(
+            'isAdm', 'isAng', 'isDos',
+            'tingkatLabels', 'tingkatData',
+            'prestasiTrendLabels', 'prestasiTrendData'
+        ));
     }
 
     private function generateUniqueFilename($directory, $filename)

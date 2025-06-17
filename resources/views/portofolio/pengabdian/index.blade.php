@@ -114,7 +114,8 @@
                             <div class="card-body collapse">
                                 <div class="row mb-4">
                                     <div class="col-md-12">
-                                        <canvas id="pieChartSkema"></canvas>
+                                        <canvas id="pieChartSkema"
+                                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -134,7 +135,8 @@
                             <div class="card-body collapse">
                                 <div class="row mb-4">
                                     <div class="col-md-12">
-                                        <canvas id="lineChartTren"></canvas>
+                                        <canvas id="lineChartTren"
+                                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -154,7 +156,8 @@
                             <div class="card-body collapse">
                                 <div class="row mb-4">
                                     <div class="col-md-12">
-                                        <canvas id="doughnutChartPeran"></canvas>
+                                        <canvas id="doughnutChartPeran"
+                                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                                         <div id="peranLegend" class="mt-3"></div>
                                     </div>
                                 </div>
@@ -175,7 +178,8 @@
                             <div class="card-body collapse">
                                 <div class="row mb-4">
                                     <div class="col-md-12">
-                                        <canvas id="barChartMahasiswaS2"></canvas>
+                                        <canvas id="barChartMahasiswaS2"
+                                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                                         <div id="mahasiswaS2LegendPengabdian" class="mt-3"></div>
                                     </div>
                                 </div>

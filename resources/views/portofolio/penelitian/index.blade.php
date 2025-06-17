@@ -111,7 +111,8 @@
                             </div>
                         </div>
                         <div class="card-body collapse">
-                            <canvas id="pieChartSkemaPenelitian"></canvas>
+                            <canvas id="pieChartSkemaPenelitian"
+                                style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                         </div>
                     </div>
                 </div>
@@ -127,7 +128,8 @@
                             </div>
                         </div>
                         <div class="card-body collapse">
-                            <canvas id="lineChartTrenPenelitian"></canvas>
+                            <canvas id="lineChartTrenPenelitian"
+                                style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                         </div>
                     </div>
                 </div>
@@ -143,7 +145,8 @@
                             </div>
                         </div>
                         <div class="card-body collapse">
-                            <canvas id="doughnutChartPeranPenelitian"></canvas>
+                            <canvas id="doughnutChartPeranPenelitian"
+                                style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                             <div id="peranLegendPenelitian" class="mt-3"></div>
                         </div>
                     </div>
@@ -160,7 +163,8 @@
                             </div>
                         </div>
                         <div class="card-body collapse">
-                            <canvas id="barChartMahasiswaS2Penelitian"></canvas>
+                            <canvas id="barChartMahasiswaS2Penelitian"
+                                style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                             <div id="mahasiswaS2LegendPenelitian" class="mt-3"></div>
                         </div>
                     </div>

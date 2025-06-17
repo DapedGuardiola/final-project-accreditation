@@ -92,53 +92,55 @@
             </div>
         </div>
 
-        @if($isAdm||$isAng)
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">Jumlah Partisipasi Berdasarkan skala</h3>
+        @if ($isAdm || $isAng)
+            <!-- Profesi -->
+            <div class="callout callout-primary shadow-sm">
+                <h5>Chart</h5>
+                <p>Chart berikut menampilkan partisipasi dosen berdasarkan jabatan dan tren sertifikasi per tahun.</p>
+            </div>
 
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                            </button>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Partisipasi Dosen berdasarkan Jabatan</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body collapse">
+                            <canvas id="pieChartPartisipasiJabatan"
+                                style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="chart">
-                            <canvas id="chartSertifikasi1"
+                </div>
+                <div class="col-md-6">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Tren Sertifikasi Per Tahun</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body collapse">
+                            <canvas id="lineChartTrenSertifikasi"
                                 style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="card card-danger">
-                    <div class="card-header">
-                        <h3 class="card-title">Partisipasi Dosen berdasarkan Jabatan</h3>
-
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="chartSertifikasi2"
-                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                    </div>
-                    <!-- /.card-body -->
-                </div>
-            </div>
-        
         @endif
-
     </div>
 @endsection
 
 @push('scripts')
     {!! $dataTable->scripts() !!}
+
+    {{-- Modal --}}
     <script>
         function modalAction(url) {
             $.get(url)
@@ -353,11 +355,11 @@
                 updateExportExcelLink();
             });
         });
-        $(document).ready(function () {
+        $(document).ready(function() {
             $.ajax({
                 url: "{{ route('portofolio.sertifikasi.chart1') }}",
                 method: 'GET',
-                success: function (response) {
+                success: function(response) {
                     const tahun = [];
                     const jumlah = [];
                     console.log(response.data);
@@ -392,11 +394,11 @@
                 }
             });
         });
-        $(document).ready(function () {
+        $(document).ready(function() {
             $.ajax({
                 url: "{{ route('portofolio.sertifikasi.chart2') }}",
                 method: 'GET',
-                success: function (response) {
+                success: function(response) {
                     const jabatan = [];
                     const jumlah = [];
 
@@ -413,7 +415,7 @@
                             labels: jabatan,
                             datasets: [{
                                 data: jumlah,
-                                backgroundColor: ['green', '#f39c12', 'red','blue'],
+                                backgroundColor: ['green', '#f39c12', 'red', 'blue'],
                                 borderColor: 'rgba(75, 192, 192, 1)',
                                 borderWidth: 1
                             }]
@@ -424,6 +426,81 @@
                     });
                 }
             });
+        });
+    </script>
+
+    {{-- Chart.js --}}
+    {{-- Chart.js --}}
+    <script>
+        // Prepare chart data from PHP variables
+        const tahunLabels = @json($tahunLabels);
+        const tahunData = @json($tahunData);
+        const jabatanLabels = @json($jabatanLabels);
+        const jabatanData = @json($jabatanData);
+
+        // Colors for charts
+        const chartColors = [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+            '#FF9F40', '#E7E9ED', '#76A346', '#D9534F', '#5BC0DE'
+        ];
+
+        // Line Chart - Distribusi Tahun Sertifikasi
+        const ctxLine = document.getElementById('lineChartTrenSertifikasi').getContext('2d');
+        const lineChartTahunSertifikasi = new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: tahunLabels,
+                datasets: [{
+                    label: 'Jumlah',
+                    data: tahunData,
+                    borderColor: '#36A2EB',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: true,
+                    tension: 0.3,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        precision: 0,
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                    title: {
+                        display: false,
+                    }
+                }
+            }
+        });
+
+        // Pie Chart - Distribusi Jenis Publikasi
+        const ctxPie = document.getElementById('pieChartPartisipasiJabatan').getContext('2d');
+        const pieChartPartisipasiJabatan = new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: jabatanLabels,
+                datasets: [{
+                    data: jabatanData,
+                    backgroundColor: chartColors,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    title: {
+                        display: false,
+                    }
+                }
+            }
         });
     </script>
 @endpush

@@ -27,7 +27,32 @@ class PSertifikasiController extends Controller
         $isDos = $user->hasRole('DOS');
         $isAng = $user->hasRole('ANG');
 
-        return $dataTable->render('portofolio.sertifikasi.index', compact('isAdm', 'isAng', 'isDos'));
+        // Distribution of partisipasi dosen berdasarkan jabatan
+        $jabatanDistribution = PSertifikasiModel::join('user', 'p_sertifikasi.id_user', '=', 'user.id_user')
+            ->join('profile_user', 'user.id_user', '=', 'profile_user.id_user')
+            ->select('profile_user.jabatan_fungsional', DB::raw('count(*) as total'))
+            ->groupBy('profile_user.jabatan_fungsional')
+            ->orderBy('total', 'desc')
+            ->get();
+
+        // Distribusi tren sertifikasi per tahun
+        $sertifikasiPerTahun = PSertifikasiModel::select('tahun_diperoleh', DB::raw('count(*) as total'))
+            ->groupBy('tahun_diperoleh')
+            ->orderBy('tahun_diperoleh', 'asc')
+            ->get();
+
+        // Prepare data arrays for charts
+        $jabatanLabels = $jabatanDistribution->pluck('jabatan_fungsional');
+        $jabatanData = $jabatanDistribution->pluck('total');
+
+        $tahunLabels = $sertifikasiPerTahun->pluck('tahun_diperoleh');
+        $tahunData = $sertifikasiPerTahun->pluck('total');
+
+        return $dataTable->render('portofolio.sertifikasi.index', compact(
+            'isAdm', 'isAng', 'isDos',
+            'jabatanLabels', 'jabatanData',
+            'tahunLabels', 'tahunData'
+        ));
     }
 
     private function generateUniqueFilename($directory, $filename)
@@ -662,41 +687,5 @@ class PSertifikasiController extends Controller
         $pdf->setOption('chroot', base_path('public'));
 
         return $pdf->stream('Data Sertifikasi ' . date('d-m-Y H:i:s') . '.pdf');
-    }
-    public function chart1(){
-        $data = PSertifikasiModel::select(DB::raw('COUNT(id_user) as jumlah, tahun_diperoleh'))
-            ->groupBy('tahun_diperoleh')
-            ->get();
-            if(!$data) {
-            return response()->json([
-                'message' => 'Data tidak ditemukan',
-                'status' => false
-            ], 404);
-        }
-
-        return response()->json([
-            'data' => $data,
-            'status' => true,
-            'message' => 'Data berhasil diambil'
-        ]);
-    }
-    public function chart2(){
-        $data = PSertifikasiModel::join('user', 'p_sertifikasi.id_user', '=', 'user.id_user')
-            ->join('profile_user', 'user.id_user', '=', 'profile_user.id_user')
-            ->select(DB::raw('COUNT(p_sertifikasi.id_user) as jumlah, profile_user.jabatan_fungsional'))
-            ->groupBy('profile_user.jabatan_fungsional')
-            ->get();
-
-        if($data->isEmpty()) {
-            return response()->json([
-                'message' => 'Data tidak ditemukan',
-                'status' => false
-            ], 404);
-        }
-        return response()->json([
-            'data' => $data,
-            'status' => true,
-            'message' => 'Data berhasil diambil'
-        ]);
     }
 }

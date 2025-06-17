@@ -27,7 +27,29 @@ class PPublikasiController extends Controller
         $isDos = $user->hasRole('DOS');
         $isAng = $user->hasRole('ANG');
 
-        return $dataTable->render('portofolio.publikasi.index', compact('isAdm', 'isAng', 'isDos'));
+        // Prepare chart data for publikasi
+        $tahunPublikasiDistribution = PPublikasiModel::select('tahun_publikasi', DB::raw('count(*) as total'))
+            ->groupBy('tahun_publikasi')
+            ->orderBy('tahun_publikasi', 'desc')
+            ->get();
+
+        $tahunPublikasiLabels = $tahunPublikasiDistribution->pluck('tahun_publikasi');
+        $tahunPublikasiData = $tahunPublikasiDistribution->pluck('total');
+
+        // Prepare jenis publikasi distribution for pie chart
+        $jenisPublikasiDistribution = PPublikasiModel::select('jenis_publikasi', DB::raw('count(*) as total'))
+            ->groupBy('jenis_publikasi')
+            ->orderBy('total', 'desc')
+            ->get();
+
+        $jenisPublikasiLabels = $jenisPublikasiDistribution->pluck('jenis_publikasi');
+        $jenisPublikasiData = $jenisPublikasiDistribution->pluck('total');
+
+        return $dataTable->render('portofolio.publikasi.index', compact(
+            'isAdm', 'isAng', 'isDos',
+            'tahunPublikasiLabels', 'tahunPublikasiData',
+            'jenisPublikasiLabels', 'jenisPublikasiData'
+        ));
     }
 
     private function generateUniqueFilename($directory, $filename)
@@ -695,22 +717,5 @@ class PPublikasiController extends Controller
         $pdf->setOption('chroot', base_path('public'));
 
         return $pdf->stream('Data Publikasi ' . date('d-m-Y H:i:s') . '.pdf');
-    }
-    public function chart1(){
-        $data = PPublikasiModel::select(DB::raw('COUNT(id_user) as jumlah, tahun_publikasi'))
-            ->groupBy('tahun_publikasi')
-            ->get();
-            if(!$data) {
-            return response()->json([
-                'message' => 'Data tidak ditemukan',
-                'status' => false
-            ], 404);
-        }
-
-        return response()->json([
-            'data' => $data,
-            'status' => true,
-            'message' => 'Data berhasil diambil'
-        ]);
     }
 }

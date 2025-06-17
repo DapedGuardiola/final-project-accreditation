@@ -27,7 +27,30 @@ class PKegiatanController extends Controller
         $isDos = $user->hasRole('DOS');
         $isAng = $user->hasRole('ANG');
 
-        return $dataTable->render('portofolio.kegiatan.index', compact('isAdm', 'isAng', 'isDos'));
+        // Distribution of Jenis Kegiatan
+        $jenisKegiatanDistribution = PKegiatanModel::select('jenis_kegiatan', DB::raw('count(*) as total'))
+            ->groupBy('jenis_kegiatan')
+            ->orderBy('total', 'desc')
+            ->get();
+
+        // Distribution of Peran Dalam Kegiatan
+        $peranDistribution = PKegiatanModel::select('peran', DB::raw('count(*) as total'))
+            ->groupBy('peran')
+            ->orderBy('total', 'desc')
+            ->get();
+
+        // Prepare data arrays for charts
+        $jenisKegiatanLabels = $jenisKegiatanDistribution->pluck('jenis_kegiatan');
+        $jenisKegiatanData = $jenisKegiatanDistribution->pluck('total');
+
+        $peranLabels = $peranDistribution->pluck('peran');
+        $peranData = $peranDistribution->pluck('total');
+
+        return $dataTable->render('portofolio.kegiatan.index', compact(
+            'isAdm', 'isAng', 'isDos',
+            'jenisKegiatanLabels', 'jenisKegiatanData',
+            'peranLabels', 'peranData'
+        ));
     }
 
     private function generateUniqueFilename($directory, $filename)
@@ -650,38 +673,4 @@ class PKegiatanController extends Controller
         return $pdf->stream('Data Kegiatan ' . date('d-m-Y H:i:s') . '.pdf');
     }
 
-    public function chart1(){
-        $data = PKegiatanModel::select(DB::raw('COUNT(id_user) as jumlah, jenis_kegiatan'))
-            ->groupBy('jenis_kegiatan')
-            ->get();
-            if(!$data) {
-            return response()->json([
-                'message' => 'Data tidak ditemukan',
-                'status' => false
-            ], 404);
-        }
-
-        return response()->json([
-            'data' => $data,
-            'status' => true,
-            'message' => 'Data berhasil diambil'
-        ]);
-    }
-    public function chart2(){
-        $data = PKegiatanModel::select(DB::raw('COUNT(id_user) as jumlah, peran'))
-            ->groupBy('peran')
-            ->get();
-            if(!$data) {
-            return response()->json([
-                'message' => 'Data tidak ditemukan',
-                'status' => false
-            ], 404);
-        }
-
-        return response()->json([
-            'data' => $data,
-            'status' => true,
-            'message' => 'Data berhasil diambil'
-        ]);
-    }
 }

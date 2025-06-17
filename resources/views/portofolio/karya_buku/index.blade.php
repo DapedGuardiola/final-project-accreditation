@@ -111,7 +111,8 @@
                                 </div>
                             </div>
                             <div class="card-body collapse">
-                                <canvas id="pieChartPenerbit"></canvas>
+                                <canvas id="pieChartPenerbit"
+                                    style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                             </div>
                         </div>
                     </div>
@@ -127,7 +128,8 @@
                                 </div>
                             </div>
                             <div class="card-body collapse">
-                                <canvas id="lineChartTrenBuku"></canvas>
+                                <canvas id="lineChartTrenBuku"
+                                    style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                             </div>
                         </div>
                     </div>
