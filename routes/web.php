@@ -112,10 +112,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/create_ajax', [KriteriaController::class, 'create_ajax'])->name('kriteria.create_ajax');
         Route::post('/store_ajax', [KriteriaController::class, 'store_ajax'])->name('kriteria.store_ajax');
         Route::get('/edit_ajax/{no_kriteria}/{id_user}', [KriteriaController::class, 'edit_ajax'])->name('kriteria.edit_ajax');
-        Route::post('/update_ajax/{no_kriteria}/{id_user}', [KriteriaController::class, 'update_ajax'])->name('kriteria.update_ajax');
+        Route::put('/update_ajax/{no_kriteria}/{id_user}', [KriteriaController::class, 'update_ajax'])->name('kriteria.update_ajax');
         Route::get('/detail_ajax/{no_kriteria}/{id_user}', [KriteriaController::class, 'detail_ajax'])->name('kriteria.detail_ajax');
         Route::get('/confirm_ajax/{no_kriteria}/{id_user}', [KriteriaController::class, 'confirm_ajax'])->name('kriteria.confirm_ajax');
         Route::delete('/delete_ajax/{no_kriteria}/{id_user}', [KriteriaController::class, 'delete_ajax'])->name('kriteria.delete_ajax');
+        Route::delete('/delete_user_ajax/{no_kriteria}/{id_user}', [KriteriaController::class, 'delete_user_ajax'])->name('kriteria.delete_user_ajax');
 
         // Import and Export routes
         Route::get('/export_excel', [KriteriaController::class, 'export_excel'])->name('kriteria.export_excel');
@@ -124,6 +125,7 @@ Route::middleware('auth')->group(function () {
         // Get last number and users
         Route::get('/get-last-number', [KriteriaController::class, 'getLastNumber'])->name('kriteria.get_last_number');
         Route::get('/get-users', [KriteriaController::class, 'getUsers'])->name('kriteria.get_users');
+        Route::get('/get-users-by-kriteria/{no_kriteria}', [KriteriaController::class, 'getUsersByKriteria'])->name('kriteria.get_users_by_kriteria');
     });
 
     // Route untuk validasi
@@ -174,9 +176,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/export_excel', [PSertifikasiController::class, 'export_excel'])->name('export_excel');
             Route::get('/export_pdf', [PSertifikasiController::class, 'export_pdf'])->name('export_pdf');
 
-            Route::get('/chart1',[PSertifikasiController::class,'chart1'])->name('chart1');
-            Route::get('/chart2',[PSertifikasiController::class,'chart2'])->name('chart2');
-
+            Route::get('/chart1', [PSertifikasiController::class, 'chart1'])->name('chart1');
+            Route::get('/chart2', [PSertifikasiController::class, 'chart2'])->name('chart2');
         });
 
         // Route Portofolio Kegiatan
@@ -202,9 +203,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/export_pdf', [PKegiatanController::class, 'export_pdf'])->name('export_pdf');
 
             // Charts
-            Route::get('/chart1',[PKegiatanController::class,'chart1'])->name('chart1');
-           Route::get('/chart2',[PKegiatanController::class,'chart2'])->name('chart2');
-
+            Route::get('/chart1', [PKegiatanController::class, 'chart1'])->name('chart1');
+            Route::get('/chart2', [PKegiatanController::class, 'chart2'])->name('chart2');
         });
 
         // Route Portofolio Prestasi
@@ -251,9 +251,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/export_pdf', [POrganisasiController::class, 'export_pdf'])->name('export_pdf');
 
             // Chart
-            Route::get('/chart1',[POrganisasiController::class,'chart1'])->name('chart1');
-            Route::get('/chart2',[POrganisasiController::class,'chart2'])->name('chart2');
-            Route::get('/chart3',[POrganisasiController::class,'chart3'])->name('chart3');
+            Route::get('/chart1', [POrganisasiController::class, 'chart1'])->name('chart1');
+            Route::get('/chart2', [POrganisasiController::class, 'chart2'])->name('chart2');
+            Route::get('/chart3', [POrganisasiController::class, 'chart3'])->name('chart3');
         });
 
         // Route Portofolio Publikasi
@@ -277,8 +277,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/export_excel', [PPublikasiController::class, 'export_excel'])->name('export_excel');
             Route::get('/export_pdf', [PPublikasiController::class, 'export_pdf'])->name('export_pdf');
 
-            Route::get('/chart1',[PPublikasiController::class,'chart1'])->name('chart1');
-            Route::get('/chart2',[PPublikasiController::class,'chart2'])->name('chart2');
+            Route::get('/chart1', [PPublikasiController::class, 'chart1'])->name('chart1');
+            Route::get('/chart2', [PPublikasiController::class, 'chart2'])->name('chart2');
         });
 
         // Route Portofolio Penelitian
@@ -398,7 +398,6 @@ Route::middleware('auth')->group(function () {
     Route::prefix('chart')->name('chart.')->middleware('authorize:ADM,VAL,ANG')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('index');
         Route::get('/more-info', [DashboardController::class, 'moreInfo'])->name('moreInfo');
-
     });
 
     // Route untuk dokumen akhir

@@ -192,8 +192,20 @@ class KriteriaController extends Controller
                 ],
             ];
 
+            // Check for duplicate users
+            $selectedUsers = $request->input('selected_users', []);
+            $uniqueUsers = array_unique($selectedUsers);
+            if (count($selectedUsers) !== count($uniqueUsers)) {
+                return response()->json([
+                    'status' => false,
+                    'alert' => 'error',
+                    'message' => 'User tidak boleh sama.',
+                ]);
+            }
+
             $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
+                Log::error('Validation failed', ['errors' => $validator->errors()->toArray()]);
                 return response()->json([
                     'status' => false,
                     'alert' => 'error',
@@ -221,16 +233,23 @@ class KriteriaController extends Controller
                     ->whereNull('deleted_at')
                     ->update(['judul' => $judul]);
 
+                // Instead of marking all as deleted, only delete those not in selected users
                 KriteriaModel::where('no_kriteria', $no_kriteria)
-                    ->whereNull('deleted_at')
-                    ->update(['deleted_at' => now()]);
+                    ->whereNotIn('id_user', $users)
+                    ->delete();
 
-                // Create new records for selected users
+                // Create new records for selected users if not exist
                 foreach ($users as $userId) {
-                    KriteriaModel::create([
-                        'no_kriteria' => $no_kriteria,
-                        'id_user' => $userId,
-                    ]);
+                    $exists = KriteriaModel::where('no_kriteria', $no_kriteria)
+                        ->where('id_user', $userId)
+                        ->whereNull('deleted_at')
+                        ->exists();
+                    if (!$exists) {
+                        KriteriaModel::create([
+                            'no_kriteria' => $no_kriteria,
+                            'id_user' => $userId,
+                        ]);
+                    }
                 }
                 return response()->json([
                     'status' => true,
@@ -280,6 +299,39 @@ class KriteriaController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Data tidak ditemukan'
+            ]);
+        }
+    }
+
+    public function delete_user_ajax(Request $request, $no_kriteria, $id_user)
+    {
+        Log::debug('delete_user_ajax called with:', ['no_kriteria' => $no_kriteria, 'id_user' => $id_user, 'id_user_type' => gettype($id_user)]);
+
+        $exists = KriteriaModel::where('no_kriteria', $no_kriteria)
+            ->where('id_user', $id_user)
+            ->exists();
+
+        if (!$exists) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User tidak ditemukan pada kriteria ini'
+            ]);
+        }
+
+        try {
+            KriteriaModel::where('no_kriteria', $no_kriteria)
+                ->where('id_user', $id_user)
+                ->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'User berhasil dihapus dari kriteria'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error deleting user from kriteria: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Gagal menghapus user: ' . $e->getMessage()
             ]);
         }
     }
@@ -436,6 +488,22 @@ class KriteriaController extends Controller
                 })
                 ->orderBy('profile_user.nama_lengkap', 'asc')
                 ->get();
+            return response()->json($users);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getUsersByKriteria($no_kriteria)
+    {
+        try {
+            $users = KriteriaModel::join('profile_user', 'kriteria.id_user', '=', 'profile_user.id_user')
+                ->where('kriteria.no_kriteria', $no_kriteria)
+                ->whereNull('kriteria.deleted_at')
+                ->select('profile_user.id_user as id', 'profile_user.nama_lengkap as name')
+                ->orderBy('profile_user.nama_lengkap', 'asc')
+                ->get();
+
             return response()->json($users);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);

@@ -86,7 +86,13 @@
             const userId = $('#id_user').val();
             const userName = $('#id_user option:selected').text();
 
-            // Tidak ada validasi di JS, biarkan controller yang memvalidasi
+            // Prevent adding duplicate users
+            if (selectedUsers.some(user => user.id === userId)) {
+                alert('User sudah dipilih.');
+                $('#id_user').val('');
+                return;
+            }
+
             if (!userId) {
                 $('#id_user').val('');
                 $('#id_user').focus();

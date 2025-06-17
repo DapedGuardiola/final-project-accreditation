@@ -55,8 +55,15 @@ class KriteriaDataTable extends DataTable
         return $model->newQuery()
             ->selectRaw('kriteria.no_kriteria, MIN(kriteria.id_user) as id_user, COUNT(DISTINCT dokumen_pendukung.id_dokumen_pendukung) as jumlah_dokumen, MIN(dokumen_kriteria.judul) as judul')
             ->leftJoin('user', 'kriteria.id_user', '=', 'user.id_user')
-            ->leftJoin('dokumen_pendukung', 'kriteria.no_kriteria', '=', 'dokumen_pendukung.no_kriteria')
-            ->leftJoin('dokumen_kriteria', 'kriteria.no_kriteria', '=', 'dokumen_kriteria.no_kriteria')
+            ->leftJoin('dokumen_pendukung', function ($join) {
+                $join->on('kriteria.no_kriteria', '=', 'dokumen_pendukung.no_kriteria')
+                     ->whereNull('dokumen_pendukung.deleted_at');
+            })
+            ->leftJoin('dokumen_kriteria', function ($join) {
+                $join->on('kriteria.no_kriteria', '=', 'dokumen_kriteria.no_kriteria')
+                     ->whereNull('dokumen_kriteria.deleted_at');
+            })
+            ->whereNull('kriteria.deleted_at')
             ->groupBy('kriteria.no_kriteria')
             ->orderBy('kriteria.no_kriteria', 'asc');
     }
