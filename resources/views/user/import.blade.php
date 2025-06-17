@@ -6,7 +6,17 @@
     @csrf
     <div class="modal-body">
         <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i> Pastikan file Excel mengikuti format template.
+            <i class="fas fa-info-circle"></i> Pastikan file Excel mengikuti format template. Perhatikan bahwa kolom
+            <b>ID Level</b> harus mengikuti pilihan berikut:
+            <div class="mt-2">
+                <ul class="mb-1">
+                    <li>1 - Administrator</li>
+                    <li>2 - Anggota (Pengisi Kriteria)</li>
+                    <li>3 - Dosen</li>
+                    <li>4 - Validator</li>
+                    <li>5 - Direktur</li>
+                </ul>
+            </div>
         </div>
 
         <div class="mb-3">
