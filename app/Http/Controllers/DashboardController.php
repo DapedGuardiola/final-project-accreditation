@@ -9,6 +9,11 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        /** @var UserModel|null $user */
+        $user = auth()->user();
+        $role = $user ? $user->getRole() : null;
+        $userId = $user ? $user->id_user : null;
+
         $tables = [
             'p_penelitian',
             'p_publikasi',
@@ -30,15 +35,29 @@ class DashboardController extends Controller
         ];
 
         foreach ($tables as $table) {
-            $tervalidasi = DB::table($table)->where('status', 'Tervalidasi')->count();
-            $perluValidasi = DB::table($table)->where('status', 'Perlu Validasi')->count();
-            $tidakValid = DB::table($table)->where('status', 'Tidak Valid')->count();
+            $query = DB::table($table)->where('status', 'Tervalidasi');
+            if ($role === 'DOS' && $userId) {
+                $query->where('id_user', $userId);
+            }
+            $tervalidasi = $query->count();
+
+            $query = DB::table($table)->where('status', 'Perlu Validasi');
+            if ($role === 'DOS' && $userId) {
+                $query->where('id_user', $userId);
+            }
+            $perluValidasi = $query->count();
+
+            $query = DB::table($table)->where('status', 'Tidak Valid');
+            if ($role === 'DOS' && $userId) {
+                $query->where('id_user', $userId);
+            }
+            $tidakValid = $query->count();
 
             $data['totalTerValidasi'] += $tervalidasi;
             $data['totalPerluValidasi'] += $perluValidasi;
             $data['totalTidakValid'] += $tidakValid;
 
-        // Bungkus dalam data['data']
+            // Bungkus dalam data['data']
             $data['data'][substr($table, 2)] = [
                 'Tervalidasi' => $tervalidasi,
                 'Perlu Validasi' => $perluValidasi,
@@ -50,6 +69,11 @@ class DashboardController extends Controller
 
     public function moreInfo(Request $request)
     {
+        /** @var UserModel|null $user */
+        $user = auth()->user();
+        $role = $user ? $user->getRole() : null;
+        $userId = $user ? $user->id_user : null;
+
         $status = strtolower($request->query('status'));
 
         $mappings = [
@@ -82,9 +106,12 @@ class DashboardController extends Controller
             if ($status) {
                 $query->where("{$table}.status", $status);
             }
+            if ($role === 'DOS' && $userId) {
+                $query->where("{$table}.{$config['id_user']}", $userId);
+            }
             $data = $data->merge($query->get());
         }
         return view('dashboard.index', compact('data', 'status'));
     }
-    
+
 }

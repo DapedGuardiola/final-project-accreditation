@@ -112,15 +112,15 @@
             </div>
         </div>
 
-
         <!-- Chart Section -->
         <div class="chart-container" style="display: flex; justify-content: space-between; gap: 20px; width: 100%;">
-            <div class="chart-section" style="width: 48%;">
+            <div class="chart-section shadow-sm" style="width: 48%;">
                 <div class="card-header bg-primary text-white border-bottom"
                     style="padding: 10px; border-radius: 0.25rem 0.25rem 0 0; display: flex; justify-content: flex-start; align-items: center; min-height: 40px;">
                     <h3 class="card-title mb-0"
                         style="font-size: 16px; font-weight: bold; white-space: nowrap; margin: 0; margin-right: auto;">
-                        Status Validasi</h3>
+                        Status Validasi
+                    </h3>
                     <select id="pieChartFilter" class="form-control form-control-sm"
                         style="background-color: white; color: black; border: none; border-radius: 3px; padding: 5px 15px; font-size: 13.5px; height: 30px; width: 150px;">
                         <option value="all">Semua Kategori</option>
@@ -137,12 +137,12 @@
                     </select>
                 </div>
                 <div class="card-body">
-                    <canvas id="pieChart" class="chart-canvas" style="width: 100%; height: 300px;"></canvas>
+                    <canvas id="pieChart" class="chart-canvas"></canvas>
                 </div>
             </div>
 
             <!-- Bar Chart -->
-            <div class="chart-section">
+            <div class="chart-section shadow-sm">
                 <div class="card-header">
                     <h3 class="card-title mb-0">Detail Setiap Portofolio</h3>
                 </div>
@@ -155,7 +155,6 @@
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const chartData = @json($data['data'] ?? []);
         const totalTerValidasi = {{ intval($data['totalTerValidasi'] ?? 0) }};
@@ -165,7 +164,9 @@
         const ctxPie = document.getElementById('pieChart').getContext('2d');
         const ctxBar = document.getElementById('barChart').getContext('2d');
 
-        const portofolios = ['penelitian', 'publikasi', 'pengabdian', 'sertifikasi', 'hki', 'karya_buku', 'kegiatan', 'organisasi', 'prestasi', 'profesi'];
+        const portofolios = ['penelitian', 'publikasi', 'pengabdian', 'sertifikasi', 'hki', 'karya_buku', 'kegiatan',
+            'organisasi', 'prestasi', 'profesi'
+        ];
 
         const pieChart = new Chart(ctxPie, {
             type: 'doughnut',
@@ -184,7 +185,9 @@
                     legend: {
                         position: 'bottom',
                         labels: {
-                            font: { size: 12 },
+                            font: {
+                                size: 12
+                            },
                             boxWidth: 12,
                             padding: 10
                         }
@@ -197,8 +200,7 @@
             type: 'bar',
             data: {
                 labels: portofolios.map(p => p.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())),
-                datasets: [
-                    {
+                datasets: [{
                         label: 'Tervalidasi',
                         data: portofolios.map(p => chartData[p]?.Tervalidasi || 0),
                         backgroundColor: '#26A69A',
@@ -222,7 +224,9 @@
                     legend: {
                         position: 'top',
                         labels: {
-                            font: { size: 12 },
+                            font: {
+                                size: 12
+                            },
                             boxWidth: 12,
                             padding: 10
                         }
@@ -231,7 +235,9 @@
                 scales: {
                     x: {
                         ticks: {
-                            font: { size: 10 },
+                            font: {
+                                size: 10
+                            },
                             autoSkip: false,
                             maxRotation: 45,
                             minRotation: 45
@@ -240,7 +246,9 @@
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            font: { size: 10 },
+                            font: {
+                                size: 10
+                            },
                             stepSize: 1
                         }
                     }
@@ -265,6 +273,5 @@
             pieChart.data.datasets[0].data = pieData;
             pieChart.update();
         });
-
     </script>
 @endpush

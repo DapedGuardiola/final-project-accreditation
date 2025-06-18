@@ -90,11 +90,66 @@
                 </div>
             </div>
         </div>
+
+        @if ($isAdm || $isAng)
+            <!-- Prestasi -->
+            <div class="callout callout-primary shadow-sm">
+                <h5>Chart</h5>
+                <p>Chart berikut menampilkan distribusi tingkat prestasi dan tren prestasi per tahun.</p>
+            </div>
+
+            <div class="container-fluid mt-3">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary border-bottom">
+                                <h5 class="card-title mb-0 text-white">Distribusi Tingkat Prestasi</h5>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body collapse">
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <canvas id="pieChartTingkatPrestasi"
+                                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary border-bottom">
+                                <h5 class="card-title mb-0 text-white">Tren Prestasi Per Tahun</h5>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body collapse">
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <canvas id="lineChartPrestasiTrend"
+                                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 @endsection
 
 @push('scripts')
     {!! $dataTable->scripts() !!}
+
+    {{-- Modal --}}
     <script>
         function modalAction(url) {
             $.get(url)
@@ -301,6 +356,82 @@
                 updateExportPdfLink();
                 updateExportExcelLink();
             });
+        });
+    </script>
+
+    {{-- Chart.js --}}
+    <script>
+        // Prepare chart data from PHP variables
+        const tingkatLabels = @json($tingkatLabels);
+        const tingkatData = @json($tingkatData);
+        const prestasiTrendLabels = @json($prestasiTrendLabels);
+        const prestasiTrendData = @json($prestasiTrendData);
+
+        // Colors for charts
+        const chartColors = [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+            '#FF9F40', '#E7E9ED', '#76A346', '#D9534F', '#5BC0DE'
+        ];
+
+        // Pie Chart - Distribusi Tingkat Prestasi
+        const ctxPieTingkat = document.getElementById('pieChartTingkatPrestasi').getContext('2d');
+        const pieChartTingkatPrestasi = new Chart(ctxPieTingkat, {
+            type: 'pie',
+            data: {
+                labels: tingkatLabels,
+                datasets: [{
+                    data: tingkatData,
+                    backgroundColor: chartColors,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    title: {
+                        display: false,
+                    }
+                }
+            }
+        });
+
+        // Line Chart - Tren Prestasi Per Tahun
+        const ctxLineTrend = document.getElementById('lineChartPrestasiTrend').getContext('2d');
+        const lineChartPrestasiTrend = new Chart(ctxLineTrend, {
+            type: 'line',
+            data: {
+                labels: prestasiTrendLabels,
+                datasets: [{
+                    label: 'Jumlah Prestasi',
+                    data: prestasiTrendData,
+                    borderColor: '#36A2EB',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        precision: 0,
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                    title: {
+                        display: false,
+                    }
+                }
+            }
         });
     </script>
 @endpush

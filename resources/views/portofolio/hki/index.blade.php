@@ -112,7 +112,8 @@
                                 </div>
                             </div>
                             <div class="card-body collapse">
-                                <canvas id="pieChartSkemaHKI"></canvas>
+                                <canvas id="pieChartSkemaHKI"
+                                    style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                             </div>
                         </div>
                     </div>
@@ -128,7 +129,8 @@
                                 </div>
                             </div>
                             <div class="card-body collapse">
-                                <canvas id="barChartMahasiswaS2HKI"></canvas>
+                                <canvas id="barChartMahasiswaS2HKI"
+                                    style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                                 <div id="mahasiswaS2LegendHKI" class="mt-3"></div>
                             </div>
                         </div>
@@ -145,7 +147,8 @@
                                 </div>
                             </div>
                             <div class="card-body collapse">
-                                <canvas id="lineChartTrenHKI"></canvas>
+                                <canvas id="lineChartTrenHKI"
+                                    style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                             </div>
                         </div>
                     </div>
@@ -466,7 +469,8 @@
                 const count = mahasiswaS2Data[index];
                 const percentage = mahasiswaS2PercentagesHKI[index];
                 const legendItem = document.createElement('div');
-                legendItem.innerHTML = `<span style="display:inline-block;width:12px;height:12px;background-color:${color};margin-right:8px;"></span>${label}: ${count} (${percentage}%)`;
+                legendItem.innerHTML =
+                    `<span style="display:inline-block;width:12px;height:12px;background-color:${color};margin-right:8px;"></span>${label}: ${count} (${percentage}%)`;
                 mahasiswaS2LegendHKIContainer.appendChild(legendItem);
             });
         }

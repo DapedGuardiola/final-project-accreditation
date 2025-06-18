@@ -96,7 +96,7 @@
             <!-- Profesi -->
             <div class="callout callout-primary shadow-sm">
                 <h5>Chart</h5>
-                <p>Chart berikut menampilkan distribusi gelar akademik dan asal perguruan tinggi dari data profesi dosen.
+                <p>Chart berikut menampilkan distribusi gelar akademik dan asal perguruan tinggi.
                 </p>
             </div>
 
@@ -115,7 +115,8 @@
                             <div class="card-body collapse">
                                 <div class="row mb-4">
                                     <div class="col-md-12">
-                                        <canvas id="pieChartGelar1"></canvas>
+                                        <canvas id="pieChartGelar1"
+                                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -134,7 +135,8 @@
                             <div class="card-body collapse">
                                 <div class="row mb-4">
                                     <div class="col-md-12">
-                                        <canvas id="barChartPerguruanTinggi"></canvas>
+                                        <canvas id="barChartPerguruanTinggi"
+                                            style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                                     </div>
                                 </div>
                             </div>

@@ -18,29 +18,3 @@
     </button>
 </div>
 </form>
-
-{{-- <script>
-$(document).ready(function() {
-    $('#btn-delete').on('click', function() {
-        $.ajax({
-            url: "{{ route('kriteria.delete_ajax', ['no_kriteria' => $kriteria->no_kriteria, 'id_user' => $kriteria->id_user]) }}",
-            method: 'DELETE',
-            data: {
-                _token: '{{ csrf_token() }}'
-            },
-            success: function(response) {
-                if(response.status) {
-                    $('#modal-delete').modal('hide');
-                    $('#kriteria-table').DataTable().ajax.reload();
-                    toastr.success(response.message);
-                } else {
-                    toastr.error(response.message);
-                }
-            },
-            error: function(xhr) {
-                toastr.error('Terjadi kesalahan');
-            }
-        });
-    });
-});
-</script> --}}

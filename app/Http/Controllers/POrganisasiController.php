@@ -27,7 +27,31 @@ class POrganisasiController extends Controller
         $isDos = $user->hasRole('DOS');
         $isAng = $user->hasRole('ANG');
 
-        return $dataTable->render('portofolio.organisasi.index', compact('isAdm', 'isAng', 'isDos'));
+        // Prepare chart data for distribusi tingkat organisasi
+        $tingkatDistribution = POrganisasiModel::select('tingkat', DB::raw('count(*) as total'))
+            ->groupBy('tingkat')
+            ->orderBy('total', 'desc')
+            ->get();
+
+        $tingkatLabels = $tingkatDistribution->pluck('tingkat');
+        $tingkatData = $tingkatDistribution->pluck('total');
+
+        // Prepare chart data for partisipasi dosen berdasarkan jabatan
+        $jabatanDistribution = POrganisasiModel::join('user', 'p_organisasi.id_user', '=', 'user.id_user')
+            ->join('profile_user', 'user.id_user', '=', 'profile_user.id_user')
+            ->select('profile_user.jabatan_fungsional', DB::raw('count(*) as total'))
+            ->groupBy('profile_user.jabatan_fungsional')
+            ->orderBy('total', 'desc')
+            ->get();
+
+        $jabatanLabels = $jabatanDistribution->pluck('jabatan_fungsional');
+        $jabatanData = $jabatanDistribution->pluck('total');
+
+        return $dataTable->render('portofolio.organisasi.index', compact(
+            'isAdm', 'isAng', 'isDos',
+            'tingkatLabels', 'tingkatData',
+            'jabatanLabels', 'jabatanData'
+        ));
     }
 
     private function generateUniqueFilename($directory, $filename)
@@ -663,57 +687,5 @@ class POrganisasiController extends Controller
         $pdf->setOption('chroot', base_path('public'));
 
         return $pdf->stream('Data Organisasi ' . date('d-m-Y H:i:s') . '.pdf');
-    }
-    public function chart1(){
-        $data = POrganisasiModel::select(DB::raw('COUNT(id_user) as jumlah, tingkat'))
-            ->groupBy('tingkat')
-            ->get();
-            if(!$data) {
-            return response()->json([
-                'message' => 'Data tidak ditemukan',
-                'status' => false
-            ], 404);
-        }
-
-        return response()->json([
-            'data' => $data,
-            'status' => true,
-            'message' => 'Data berhasil diambil'
-        ]);
-    }
-    public function chart2(){
-        $data = POrganisasiModel::select(DB::raw('COUNT(id_user) as jumlah, status'))
-            ->groupBy('status')
-            ->get();
-            if(!$data) {
-            return response()->json([
-                'message' => 'Data tidak ditemukan',
-                'status' => false
-            ], 404);
-        }
-        return response()->json([
-            'data' => $data,
-            'status' => true,
-            'message' => 'Data berhasil diambil'
-        ]);
-    }
-    public function chart3(){
-        $data = POrganisasiModel::join('user', 'p_organisasi.id_user', '=', 'user.id_user')
-            ->join('profile_user', 'user.id_user', '=', 'profile_user.id_user')
-            ->select(DB::raw('COUNT(p_organisasi.id_user) as jumlah, profile_user.jabatan_fungsional'))
-            ->groupBy('profile_user.jabatan_fungsional')
-            ->get();
-
-        if($data->isEmpty()) {
-            return response()->json([
-                'message' => 'Data tidak ditemukan',
-                'status' => false
-            ], 404);
-        }
-        return response()->json([
-            'data' => $data,
-            'status' => true,
-            'message' => 'Data berhasil diambil'
-        ]);
     }
 }
